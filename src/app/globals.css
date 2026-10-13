@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  /* ==========================================================================
+     متغيرات التصميم المركزية (Design System Tokens)
+     يمكن تعديل أي لون من هنا وسينعكس تلقائياً على كامل المنصة
+     ========================================================================== */
+
+  /* 1. اللون الأساسي (الأزرق الملكي للإجراءات والأزرار العامة) */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #eff6ff;
+
+  /* 2. لون هوية مساعد الذكاء الاصطناعي فقط (البنفسجي الذكي) */
+  --color-ai: #7c3aed;
+  --color-ai-hover: #6d28d9;
+  --color-ai-light: #f5f3ff;
+
+  /* 3. لون تدفق البيانات والمزامنة (السيان التكنولوجي) */
+  --color-sync: #0891b2;
+  --color-sync-hover: #0e7490;
+  --color-sync-light: #ecfeff;
+
+  /* 4. ألوان الحالات الثابتة (ممنوع تغيير دلالتها) */
+  --color-success: #16a34a;       /* النجاح والصحة التشغيلية */
+  --color-success-light: #f0fdf4;
+  --color-warning: #d97706;       /* التحذيرات والانتظار */
+  --color-warning-light: #fffbeb;
+  --color-danger: #dc2626;        /* الأخطاء والتنبيهات */
+  --color-danger-light: #fef2f2;
+
+  /* 5. خلفيات الأسطح والمحتوى (مريحة وفاتحة للبيانات) */
+  --color-background: #f8fafc;    /* خلفية المحتوى الفاتحة */
+  --color-surface: #ffffff;       /* خلفية البطاقات البيضاء */
+  --color-surface-muted: #f1f5f9; /* أسطح ثانوية ناعمة */
+  --color-border: #e2e8f0;        /* حدود ناعمة للبطاقات */
+  --color-border-subtle: #f1f5f9;
+
+  /* 6. الشريط الجانبي (كحلي داكن مؤسسي) */
+  --color-sidebar-bg: #0f172a;
+  --color-sidebar-hover: #1e293b;
+  --color-sidebar-border: #1e293b;
+  --color-sidebar-text: #94a3b8;
+  --color-sidebar-text-active: #ffffff;
+
+  /* 7. النصوص عالية التباين لقراءة البيانات والجداول */
+  --color-text-main: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-subtle: #94a3b8;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-main);
+  font-family: var(--font-cairo), 'Segoe UI', Tahoma, Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* تنسيق شريط التمرير بنمط نظيف وخفيف */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
