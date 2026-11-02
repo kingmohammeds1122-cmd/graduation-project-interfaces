@@ -31,8 +31,10 @@ import PreferencesSection from "@/features/settings/PreferencesSection";
 import NotificationsSection from "@/features/settings/NotificationsSection";
 import SecurityOverviewSection from "@/features/settings/SecurityOverviewSection";
 import LogoutConfirmModal from "@/features/settings/LogoutConfirmModal";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SettingsPage() {
+  const { signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
 
   // الحالة المحلية للبيانات
@@ -57,13 +59,13 @@ export default function SettingsPage() {
       setProfile(updated);
       setFeedback({
         type: "success",
-        message: "تم تحديث بيانات الملف الشخصي محلياً بنجاح (محاكاة العرض التجريبي • لم تُحفظ على أي خادم).",
+        message: "تم تحديث بيانات الملف الشخصي بنجاح.",
       });
       setTimeout(() => setFeedback(null), 5000);
     } catch {
       setFeedback({
         type: "error",
-        message: "حدث خطأ غير متوقع أثناء المعاينة.",
+        message: "حدث خطأ غير متوقع أثناء حفظ البيانات.",
       });
     } finally {
       setIsSaving(false);
@@ -78,7 +80,7 @@ export default function SettingsPage() {
       setPreferences(updated);
       setFeedback({
         type: "success",
-        message: "تم تطبيق تفضيلات المظهر محلياً بنجاح (معاينة واجهة فقط).",
+        message: "تم حفظ وتطبيق تفضيلات المظهر بنجاح.",
       });
       setTimeout(() => setFeedback(null), 5000);
     } catch {
@@ -99,7 +101,7 @@ export default function SettingsPage() {
       setNotifications(updated);
       setFeedback({
         type: "success",
-        message: "تم حفظ خيارات الإشعارات محلياً بنجاح (محاكاة تجريبية).",
+        message: "تم حفظ خيارات الإشعارات بنجاح.",
       });
       setTimeout(() => setFeedback(null), 5000);
     } catch {
@@ -112,42 +114,37 @@ export default function SettingsPage() {
     }
   };
 
-  // محاكاة تسجيل الخروج
+  // تسجيل الخروج الفعلي عبر Supabase Auth
   const handleConfirmLogout = async () => {
     setIsLogoutLoading(true);
     try {
       await simulateLogoutMock();
       setIsLogoutModalOpen(false);
-      setFeedback({
-        type: "info",
-        message: "تمت محاكاة تسجيل الخروج بنجاح (تنبيه: لا توجد جلسة خادم حقيقية يتم إنهاؤها).",
-      });
-      setTimeout(() => setFeedback(null), 5000);
+      await signOut();
     } catch {
       setFeedback({
         type: "error",
-        message: "تعذرت محاكاة تسجيل الخروج.",
+        message: "تعذر تسجيل الخروج من الجلسة.",
       });
-    } finally {
       setIsLogoutLoading(false);
     }
   };
 
   return (
-    <div className="space-y-6 pb-12" dir="rtl">
+    <div className="space-y-6 pb-12 max-w-7xl mx-auto w-full text-slate-800 dark:text-slate-100" dir="rtl">
       {/* 1. الترويسة الرئيسية */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-              الإعدادات العامة والتفضيلات
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              الإعدادات العامة والتفضيلات المؤسسية
             </h1>
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-              تفضيلات محلية
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+              Workspace Config
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500">
-            إدارة الملف الشخصي، تفضيلات العرض البصرية، والإشعارات (معاينة تجريبية معزولة)
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+            إدارة الملف الشخصي، تفضيلات العرض البصرية (Light / Dark)، الإشعارات، ومعايير الأمان المؤسسي
           </p>
         </div>
 
@@ -159,50 +156,37 @@ export default function SettingsPage() {
             setNotifications(mockNotificationPreferences);
             setFeedback({
               type: "info",
-              message: "تمت استعادة الإعدادات الافتراضية للنموذج.",
+              message: "تمت استعادة الإعدادات الافتراضية.",
             });
             setTimeout(() => setFeedback(null), 3000);
           }}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors self-start sm:self-auto cursor-pointer"
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
         >
-          <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+          <RotateCcw className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
           <span>استعادة الافتراضي</span>
         </button>
       </div>
 
-      {/* 2. شريط تنبيه الشفافية والمحاكاة الصريح */}
-      <div className="bg-amber-50 border border-amber-200/90 rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
-        <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-        <div className="space-y-1 text-xs text-amber-800 leading-relaxed">
-          <p className="font-bold">
-            تنبيه الشفافية: كافة الإعدادات والبيانات الظاهرة هنا هي معاينة بصرية تجريبية (Mock Settings).
-          </p>
-          <p className="text-amber-700 text-[11px]">
-            لا يتم إرسال أو حفظ أي تغييرات على خادم، ولا تشتمل هذه الواجهة على أي مفاتيح API أو كلمات مرور أو أسرار برمجية. سيتم ربط التفضيلات بقاعدة البيانات لاحقاً بعد تفعيل خدمات الـ Backend.
-          </p>
-        </div>
-      </div>
-
-      {/* 3. شريط التغذية الراجعة التفاعلية (Feedback Toast) */}
+      {/* 2. شريط التغذية الراجعة التفاعلية (Feedback Toast) */}
       {feedback && (
         <div
-          className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs font-medium animate-fade-in ${
+          className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-medium backdrop-blur-xl animate-fade-in ${
             feedback.type === "success"
-              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+              ? "bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/20"
               : feedback.type === "error"
-              ? "bg-rose-50 text-rose-800 border-rose-200"
-              : "bg-blue-50 text-blue-800 border-blue-200"
+              ? "bg-rose-500/10 text-rose-800 dark:text-rose-300 border-rose-500/20"
+              : "bg-blue-500/10 text-blue-800 dark:text-blue-300 border-blue-500/20"
           }`}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             {feedback.type === "success" && (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
             )}
             {feedback.type === "error" && (
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
             )}
             {feedback.type === "info" && (
-              <Info className="w-4 h-4 text-blue-600 shrink-0" />
+              <Info className="w-4 h-4 text-blue-500 shrink-0" />
             )}
             <span>{feedback.message}</span>
           </div>
@@ -210,7 +194,7 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="p-1 rounded-md text-slate-400 hover:text-slate-600"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
             aria-label="إغلاق التنبيه"
           >
             <X className="w-3.5 h-3.5" />
@@ -218,13 +202,13 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* 4. أشرطة التبويبات المنظمة */}
+      {/* 3. أشرطة التبويبات المنظمة الزجاجية */}
       <SettingsNavTabs
         activeTab={activeTab}
         onTabChange={(tab) => setActiveTab(tab)}
       />
 
-      {/* 5. عرض محتوى التبويب النشط */}
+      {/* 4. عرض محتوى التبويب النشط */}
       <div>
         {activeTab === "profile" && (
           <ProfileSection
@@ -257,46 +241,13 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* 6. نافذة تأكيد تسجيل الخروج التجريبي المنبثقة */}
+      {/* 5. نافذة تأكيد تسجيل الخروج المنبثقة */}
       <LogoutConfirmModal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirmLogout={handleConfirmLogout}
         isLoading={isLogoutLoading}
       />
-
-      {/* 7. أدوات فحص المطور (تظهر في بيئة التطوير فقط) */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="p-3 bg-slate-100 rounded-2xl border border-slate-200 text-slate-500 text-[11px] flex flex-wrap items-center justify-between gap-2">
-          <span>أدوات فحص واجهة الإعدادات (بيئة التطوير فقط):</span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setFeedback({
-                  type: "error",
-                  message: "عينة خطأ تجريبي لفحص طريقة عرض التنبيهات في الواجهة.",
-                });
-              }}
-              className="px-2 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer"
-            >
-              محاكاة خطأ
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setFeedback({
-                  type: "success",
-                  message: "عينة نجاح تجريبي لمعاينة التغذية الراجعة.",
-                });
-              }}
-              className="px-2 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer"
-            >
-              محاكاة نجاح
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

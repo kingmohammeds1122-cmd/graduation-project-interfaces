@@ -1,36 +1,218 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# منصة ذكاء الأعمال والذكاء الاصطناعي المؤسسية
+### Enterprise AI Business Intelligence & Knowledge Platform
 
-## Getting Started
+[![Next.js](https://img.shields.io/badge/Next.js-16.4.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.3.0-blue?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-SSR-3ecf8e?style=for-the-badge&logo=supabase)](https://supabase.com/)
+[![RTL Supported](https://img.shields.io/badge/RTL-Native_Arabic-emerald?style=for-the-badge)](https://developer.mozilla.org/en-US/docs/Glossary/RTL)
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🌟 نبذة عامة عن المشروع (Overview)
+
+**منصة ذكاء الأعمال والذكاء الاصطناعي المؤسسية** هي منصة ويب متطورة فائقة الأداء صُممت لتمكين المؤسسات والشركات من استثمار بياناتها وإدارتها بذكاء عبر دمج تقنيات ذكاء الأعمال (BI) وتحليلات البيانات مع نماذج الذكاء الاصطناعي التوليدي وقواعد المعرفة المؤسسية (RAG / Knowledge Bases).
+
+تتميز المنصة بدعم أصلي وكامل للغة العربية واتجاه القراءة والواجهات من اليمين إلى اليسار (**RTL Native**)، مع نظام تصميم زجاجي عصري (**Dual-Theme Glassmorphism**) يوازن بين الرصانة المؤسسية والأناقة البصرية الحديثة.
+
+---
+
+## 🛠️ المكدس التقني المعتمد (Tech Stack)
+
+تم بناء المنصة بالاعتماد على أحدث التقنيات البرمجية وأكثرها استقراراً:
+
+* **Next.js 16.4.0 (App Router & Turbopack):** الاستفادة الكاملة من ميزات التوجيه الحديث، وتوليد الصفحات المسرع، ودعم خوادم SSR و Static Generation.
+* **React 19.3.0:** استخدام أحدث إمكانيات React ومحسن الأداء والتحديثات التلقائية للحالة.
+* **TypeScript 5:** كتابة برمجية صارمة النوعية (Strict Type-Safety) لكافة نماذج البيانات، والخدمات، والواجهات.
+* **Tailwind CSS v4:** محرك التنسيق فائق السرعة، ومبني بمحددات متغيرات CSS حديثة لدعم السمات الديناميكية (CSS Variables).
+* **Lucide Icons (v1.55+):** مكتبة أيقونات متجهة متناسقة وخفيفة ومعدة لدعم RTL بسلاسة.
+* **Supabase SSR (`@supabase/ssr` & `@supabase/supabase-js`):** طبقة مصادقة وإدارة جلسات موثوقة تدعم المصادقة المزدوجة على جهة العميل والخادم.
+* **IBM Plex Sans Arabic & JetBrains Mono:** طباعة خطية احترافية مصممة خصيصاً لواجهات الأعمال والبيانات.
+
+---
+
+## 🏛️ المزايا المعمارية والهندسة البرمجية (Architectural Highlights)
+
+### 1. المعمارية ثلاثية الطبقات (Three-Tier Architecture)
+تم فصل الاهتمامات البرمجية بشكل كامل لضمان سهولة الصيانة، واستبدال الواجهات الخلفية، وإجراء الاختبارات:
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                 طبقة العرض والواجهات (Presentation Layer)      │
+│          App Pages / Feature Modules / UI Components         │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   طبقة الخدمات (Service Layer)               │
+│          src/services/*.service.ts (معزولة بالكامل)          │
+└──────────────┬──────────────────────────────┬───────────────┘
+               │                              │
+  [USE_MOCK_API = true]          [USE_MOCK_API = false]
+               │                              │
+               ▼                              ▼
+┌──────────────────────────────┐ ┌─────────────────────────────┐
+│  محاكاة البيانات المعزولة    │ │  عميل الاتصال المركزي (API)  │
+│       src/mocks/*.mock.ts    │ │    src/lib/api-client.ts    │
+└──────────────────────────────┘ └──────────────┬──────────────┘
+                                                │
+                                                ▼
+                                 ┌─────────────────────────────┐
+                                 │     خادم Backend الحي       │
+                                 │       (FastAPI / REST)      │
+                                 └─────────────────────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. وضع المحاكاة المزدوج (Dual Simulation Mode)
+تتيح المنصة التبديل الفوري بين وضع العرض التجريبي المعزول (Mock Mode) والربط الفعلي بالخادم عبر متغير بيئة واحد:
+```env
+NEXT_PUBLIC_USE_MOCK_API=true   # وضع المحاكاة (بيانات واقعية جاهزة للتطوير والعرض)
+NEXT_PUBLIC_USE_MOCK_API=false  # وضع الاتصال الفعلي بالخادم عبر REST API
+```
+- جميع الخدمات (`src/services/`) تستجيب فورياً لهذا المتغير بدون الحاجة لإعادة كتابة كود الواجهات.
+- تتوفر دقة عالية في محاكاة زمن الاستجابة (Network Latency) وحالات الخطأ للتأكد من واقعية تجربة الاستخدام.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. نظام الثيم الزجاجي المزدوج (Dual-Theme Glassmorphism)
+نظام ألوان ديناميكي متكامل يدعم الانتقال الفوري والمحفوظ تلقائياً بين:
+* **Corporate Light Mode:** مظهر أعمال مؤسسي ناصع وواضح يعزز قراءة الجداول والأرقام والتقارير.
+* **Glassy Dark Mode (`#070B19`):** خلفية ليلية عميقة غنية بالظلال والتأثيرات الزجاجية الشفافة وتوهج الحواف المتقن.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. المكونات التفاعلية المتقدمة (Signature Components)
+* **`GlowCard`:** بطاقة تفاعلية فائقة الجمال تتبع موضع مؤشر الفأرة (Mouse Cursor) لرسم توهج ناعم ومحدد حول البطاقة تلقائياً في الوضعين الداكن والفاتح.
+* **`CommandPalette`:** لوحة تحكم وتنقل وبحث فوري يمكن تشغيلها بزر الاختصار السريع (`Ctrl+K` أو `Cmd+K`) للتنقل السريع بين الشاشات والوثائق والتقارير.
+* **`DayNightSwitch`:** مفتاح تبديل سينمائي سلس للتبديل بين وضعي النهار والليل مع حفظ تفضيل المستخدم في `localStorage`.
+* **`ChatReasoningStepper`:** مكوّن تفاعلي فريد يعرض خطوات تفكير الذكاء الاصطناعي (Chain-of-Thought) ومراحل البحث في مستودعات المعرفة خطوة بخطوة.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🖥️ الشاشات والوحدات الرئيسية (Platform Screens)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+تحتوي المنصة على 8 شاشات مؤسسية متكاملة برمجياً وتصميمياً:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **لوحة التحكم المركزية (Executive Dashboard):**
+   - مؤشرات الأداء الحيوية (KPIs)، ومعدلات استهلاك الذكاء الاصطناعي، ومراقبة النشاط اللحظي، ومسارات الوصول السريع.
+2. **شاشة التحليلات وذكاء الأعمال (BI Analytics):**
+   - رسوم بيانية ديناميكية للإيرادات، توزيع الأداء حسب الأقسام، مرشحات زمنية وتصنيفية متعددة، وتحليل الاتجاهات (Trends).
+3. **مساعد الذكاء الاصطناعي والمحادثة المعرفية (AI Chat & Reasoning):**
+   - محادثة تفاعلية سريعة، استعراض المراجع والمصادر التوثيقية، وعرض شجرة الاستدلال ومسار التفكير (Reasoning Steps).
+4. **مصادر البيانات والتكاملات (Data Sources & Integrations):**
+   - إدارة الاتصالات بقواعد البيانات، ومستودعات التخزين السحابي، والـ APIs، مع مؤشرات فورية لحالة المزامنة والصحة.
+5. **مستودع الوثائق والمعرفة (Documents & Knowledge Base):**
+   - إدارة الملفات والوثائق المدخلة للذكاء الاصطناعي، التضمين الشعاعي (Vector Embeddings)، فلاتر متقدمة وحالة الفهرسة.
+6. **التقارير الذكية والمجدولة (Smart Reports):**
+   - استعراض التقارير الدورية الصادرة آلياً، جدولة التصدير (PDF / Excel)، معاينة سريعة وتنزيل بضغطة زر.
+7. **إعدادات المنصة والأمان (Settings & Security):**
+   - تخصيص الملف الشخصي، تفضيلات العرض واللغة، سجل الأمان والجلسات، وإشعارات النظام.
+8. **المصادقة والأمان (Authentication & Access Control):**
+   - شاشات تسجيل الدخول، إنشاء الحساب، استعادة كلمة المرور، وتهيئة الحسابات الجديدة عبر Supabase SSR.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📂 بنية المشروع (Project Structure)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+graduation-project-interfaces/
+├── public/                 # الأصول الثابتة والصور والشعارات
+├── src/
+│   ├── app/                # صفحات ومسارات Next.js App Router
+│   │   ├── (auth)/         # مسارات المصادقة (تسجيل الدخول، التسجيل، ...)
+│   │   ├── (main)/         # الشاشات الرئيسية للمنصة (Dashboard, Analytics, ...)
+│   │   ├── globals.css     # المتغيرات والتنسيقات العامة وقواعد التصميم الزجاجي
+│   │   └── layout.tsx      # الغلاف الجذري للمنصة ودعم اللغة والخطوط
+│   ├── components/         # المكونات العامة المشتركة
+│   │   ├── auth/           # بطاقات ومدخلات المصادقة
+│   │   ├── dashboard/      # مكونات لوحة التحكم المتخصصة
+│   │   ├── layout/         # الهيدر، القائمة الجانبية، لوحة الأوامر (CommandPalette)
+│   │   └── ui/             # المكونات الأساسية (GlowCard, StatCard, DayNightSwitch, ...)
+│   ├── context/            # سياقات إدارة الحالة المشتركة (ThemeContext, ...)
+│   ├── features/           # المكونات الجزئية المعزولة لكل شاشة
+│   │   ├── analytics/      # رسوم وفلاتر ومؤشرات التحليلات
+│   │   ├── chat/           # عناصر المحادثة وخطوات الاستدلال
+│   │   ├── data-sources/   # جداول ونوافذ مصادر البيانات
+│   │   ├── documents/      # جداول ومنطقة رفع الوثائق
+│   │   ├── reports/        # جداول ونوافذ التقارير ومعاينتها
+│   │   └── settings/       # أقسام الأمان، التفضيلات، والإشعارات
+│   ├── lib/                # مكتبات التهيئة وعميل الاتصال (API Client, Supabase)
+│   ├── mocks/              # البيانات التجريبية المعزولة لوضع المحاكاة
+│   ├── services/           # طبقة وسيطة موحدة للتواصل مع الـ APIs أو الـ Mocks
+│   └── types/              # تعريفات الأنواع (TypeScript Definitions)
+├── .env.example            # نموذج متغيرات البيئة الآمن للاستخدام
+├── .gitignore              # قواعد استبعاد الملفات السرية والحزم المؤقتة
+├── package.json            # الحزم والتبعيات والسكربتات
+├── README.md               # الدليل التوثيقي الشامل للمشروع
+└── tsconfig.json           # إعدادات مترجم TypeScript الصارمة
+```
+
+---
+
+## 🚀 خطوات التشغيل السريع (Quick Start)
+
+### المتطلبات الأساسية
+- تثبيت بيئة **Node.js** (الإصدار 20 LTS أو أحدث موصى به).
+- مدير الحزم **npm** أو **pnpm** أو **yarn**.
+
+### 1. تثبيت الحزم والتبعيات
+قم بتثبيت كافة التبعيات الخاصة بالمشروع عبر تشغيل الأمر:
+```bash
+npm install
+```
+
+### 2. إعداد متغيرات البيئة
+انسخ ملف الإعدادات النموذجي `.env.example` لإنشاء ملف البيئة المحلي الخاص بك:
+```bash
+cp .env.example .env.local
+```
+محتوى المتغيرات الأساسية:
+```env
+# رابط خادم الـ API الخلفي (FastAPI أو غيره)
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
+
+# تفعيل وضع المحاكاة (true للتشغيل التجريبي المعزول، false للربط الحي)
+NEXT_PUBLIC_USE_MOCK_API=true
+
+# إعدادات Supabase (اختياري للمصادقة المتقدمة)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+### 3. تشغيل الخادم المحلي للتطوير
+شغّل خادم التطوير مع تفعيل محرك Turbopack فائق السرعة:
+```bash
+npm run dev
+```
+افتح المتصفح وتوجه إلى:
+```text
+http://localhost:3000
+```
+
+### 4. بناء المشروع للإنتاج (Production Build)
+للتأكد من سلامة الأكواد والتحقق البرمجي التام:
+```bash
+npm run build
+```
+ولتشغيل النسخة المجهزة للإنتاج:
+```bash
+npm run start
+```
+
+### 5. فحص الجودة والتنسيق البرمجي
+```bash
+npm run lint
+```
+
+---
+
+## 🔒 الأمان وحماية البيانات (Security & Privacy)
+
+- **حماية الأسرار:** لا يتم رفع أو حفظ أي مفاتيح سرية في المستودع البرمجي، ويتم تجاهل كافة ملفات `.env` و `.env.local` عبر `.gitignore`.
+- **معالجة الرموز المميزة (Token Injection):** يعتمد عميل الاتصال `api-client.ts` على التمرير التلقائي لترويسات التفويض عبر نمط Bearer Token من الجلسة الموثقة.
+- **التوافق المؤسسي:** عزل كامل لطبقة المحاكاة لمنع تسرب البيانات الحساسة أثناء فترات العرض والتجربة.
+
+---
+
+## 👥 المساهمة والتطوير (Contribution)
+
+تم تطوير هذا المشروع كمنظومة رائدة لربط واجهات ذكاء الأعمال المؤسسية بأحدث أنظمة الذكاء الاصطناعي وتحليل البيانات.
+
+لأي استفسار أو اقتراح، يرجى فتح **Issue** أو تقديم **Pull Request** عبر المستودع الرسمي.

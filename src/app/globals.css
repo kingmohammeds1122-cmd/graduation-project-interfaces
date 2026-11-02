@@ -1,74 +1,192 @@
 @import "tailwindcss";
 
-:root {
-  /* ==========================================================================
-     متغيرات التصميم المركزية (Design System Tokens)
-     يمكن تعديل أي لون من هنا وسينعكس تلقائياً على كامل المنصة
-     ========================================================================== */
+@custom-variant dark (&:where(.dark, .dark *));
 
-  /* 1. اللون الأساسي (الأزرق الملكي للإجراءات والأزرار العامة) */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-light: #eff6ff;
+@keyframes borderSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
-  /* 2. لون هوية مساعد الذكاء الاصطناعي فقط (البنفسجي الذكي) */
-  --color-ai: #7c3aed;
-  --color-ai-hover: #6d28d9;
-  --color-ai-light: #f5f3ff;
+.animate-border-spin {
+  animation: borderSpin 6s linear infinite;
+}
 
-  /* 3. لون تدفق البيانات والمزامنة (السيان التكنولوجي) */
-  --color-sync: #0891b2;
-  --color-sync-hover: #0e7490;
-  --color-sync-light: #ecfeff;
+@layer base {
+  :root {
+    /* ==========================================================================
+       متغيرات التصميم المؤسسية (Enterprise Design System Tokens - Light)
+       ========================================================================== */
 
-  /* 4. ألوان الحالات الثابتة (ممنوع تغيير دلالتها) */
-  --color-success: #16a34a;       /* النجاح والصحة التشغيلية */
-  --color-success-light: #f0fdf4;
-  --color-warning: #d97706;       /* التحذيرات والانتظار */
-  --color-warning-light: #fffbeb;
-  --color-danger: #dc2626;        /* الأخطاء والتنبيهات */
-  --color-danger-light: #fef2f2;
+    /* 1. الخطوط الرسمية */
+    --font-sans: var(--font-ibm-plex-arabic), "IBM Plex Sans Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* 5. خلفيات الأسطح والمحتوى (مريحة وفاتحة للبيانات) */
-  --color-background: #f8fafc;    /* خلفية المحتوى الفاتحة */
-  --color-surface: #ffffff;       /* خلفية البطاقات البيضاء */
-  --color-surface-muted: #f1f5f9; /* أسطح ثانوية ناعمة */
-  --color-border: #e2e8f0;        /* حدود ناعمة للبطاقات */
-  --color-border-subtle: #f1f5f9;
+    /* 2. اللون الأساسي (الأزرق المؤسسي) */
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-primary-light: #eff6ff;
 
-  /* 6. الشريط الجانبي (كحلي داكن مؤسسي) */
-  --color-sidebar-bg: #0f172a;
-  --color-sidebar-hover: #1e293b;
-  --color-sidebar-border: #1e293b;
-  --color-sidebar-text: #94a3b8;
-  --color-sidebar-text-active: #ffffff;
+    /* 3. لون مساعد الذكاء الاصطناعي (البنفسجي الذكي) */
+    --color-ai: #7c3aed;
+    --color-ai-hover: #6d28d9;
+    --color-ai-light: #f5f3ff;
 
-  /* 7. النصوص عالية التباين لقراءة البيانات والجداول */
-  --color-text-main: #0f172a;
-  --color-text-muted: #64748b;
-  --color-text-subtle: #94a3b8;
+    /* 4. لون تدفق البيانات والمزامنة (السيان التكنولوجي) */
+    --color-sync: #0891b2;
+    --color-sync-hover: #0e7490;
+    --color-sync-light: #ecfeff;
+
+    /* 5. ألوان الحالات الدلالية المؤسسية */
+    --color-success: #16a34a;
+    --color-success-light: #f0fdf4;
+    --color-warning: #d97706;
+    --color-warning-light: #fffbeb;
+    --color-danger: #dc2626;
+    --color-danger-light: #fef2f2;
+
+    /* 6. خلفيات الأسطح والمحتوى (مظهر مؤسسي هادئ) */
+    --color-background: #f8fafc;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f1f5f9;
+    --color-border: #e2e8f0;
+    --color-border-subtle: #f1f5f9;
+
+    /* 7. الشريط الجانبي الداكن عالي التباين */
+    --color-sidebar-bg: #0b132b;
+    --color-sidebar-hover: #1c2541;
+    --color-sidebar-border: #1e293b;
+    --color-sidebar-text: #94a3b8;
+    --color-sidebar-text-active: #ffffff;
+
+    /* 8. النصوص المؤسسية عالية الوضوح */
+    --color-text-main: #0f172a;
+    --color-text-muted: #64748b;
+    --color-text-subtle: #94a3b8;
+  }
+
+  :root.dark,
+  .dark {
+    /* ==========================================================================
+       الوضع الداكن الزجاجي الفاخر (Glassy Dark Mode - 21st.dev & Enterprise SaaS)
+       ========================================================================== */
+    --color-background: #070b19;
+    --color-surface: rgba(15, 23, 42, 0.65);
+    --color-surface-muted: rgba(30, 41, 59, 0.5);
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-border-subtle: rgba(255, 255, 255, 0.06);
+
+    --color-sidebar-bg: #070b19;
+    --color-sidebar-hover: #131c38;
+    --color-sidebar-border: rgba(255, 255, 255, 0.08);
+    --color-sidebar-text: #94a3b8;
+    --color-sidebar-text-active: #ffffff;
+
+    --color-text-main: #f8fafc;
+    --color-text-muted: #94a3b8;
+    --color-text-subtle: #64748b;
+  }
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-text-main);
-  font-family: var(--font-cairo), 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-family: var(--font-ibm-plex-arabic), "IBM Plex Sans Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* تنسيق شريط التمرير بنمط نظيف وخفيف */
+/* تنسيق الخط التقني للأكواد والأرقام الفنية */
+code, kbd, samp, pre, .font-mono {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+}
+
+/* كلاس منع اهتزاز الأرقام في الجداول ومؤشرات الأداء */
+.tabular-nums,
+table td,
+.metric-value {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* شريط تمرير مؤسسي ناعم وأنيق */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 9999px;
+  transition: background-color 0.2s ease;
 }
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* دعم شريط التمرير القياسي في متصفح Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.dark * {
+  scrollbar-color: #334155 transparent;
+}
+
+/* تأثيرات حركية متقدمة (Orbit and Pulse Animations) */
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes float-ambient {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.02);
+  }
+}
+
+.animate-orbit {
+  animation: orbit-spin 6s linear infinite;
+}
+
+.animate-orbit-reverse {
+  animation: orbit-spin-reverse 4s linear infinite;
+}
+
+.animate-float-slow {
+  animation: float-ambient 8s ease-in-out infinite;
 }

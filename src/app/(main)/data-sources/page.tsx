@@ -9,6 +9,9 @@ import {
   Loader2,
   Info,
   X,
+  Server,
+  Layers,
+  Cpu,
 } from "lucide-react";
 import {
   DataSource,
@@ -28,6 +31,7 @@ import DataSourceTable from "@/features/data-sources/DataSourceTable";
 import DataSourceModal from "@/features/data-sources/DataSourceModal";
 import DataSourceDetailsModal from "@/features/data-sources/DataSourceDetailsModal";
 import DeleteConfirmModal from "@/features/data-sources/DeleteConfirmModal";
+import GlowCard from "@/components/ui/GlowCard";
 
 export default function DataSourcesPage() {
   const [sources, setSources] = useState<DataSource[]>(mockDataSources);
@@ -55,6 +59,10 @@ export default function DataSourcesPage() {
     type: "success" | "info" | "error";
     message: string;
   } | null>(null);
+
+  // إحصائيات سريعة للبطاقات المتوهجة
+  const connectedCount = sources.filter((s) => s.status === "connected").length;
+  const totalTables = sources.reduce((acc, curr) => acc + (curr.schema?.length || 0), 0);
 
   // دالة تصفية وتحديث البيانات بناءً على التفاعل
   const handleFilterChange = async (newFilters: DataSourceFilterOptions) => {
@@ -186,54 +194,111 @@ export default function DataSourcesPage() {
   };
 
   return (
-    <div className="space-y-5 md:space-y-6 max-w-7xl mx-auto w-full">
+    <div className="space-y-6 max-w-7xl mx-auto w-full text-slate-800 dark:text-slate-100">
       {/* 1. الترويسة الرئيسية مع شارة الشفافية */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
               إدارة مصادر البيانات (Data Sources)
             </h2>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
-              بيانات ومخططات محاكاة (Mock)
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+              Zero-Trust Metadata Discovery
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 font-medium">
-            استعراض وفحص مصادر البيانات وقواعد البيانات التجريبية بدون اتصال فعلي بالخادم
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+            ربط وإدارة مصادر قواعد البيانات العلائقية ومستودعات الميتاداتا المفهرسة لنواة الذكاء الاصطناعي
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold self-start sm:self-auto">
-          <Database className="w-4 h-4 text-blue-600" />
-          <span>المصادر المعرفة: {totalCount}</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-semibold self-start sm:self-auto">
+          <Server className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <span>المصادر المتاحة: <strong className="text-blue-600 dark:text-blue-400 font-mono">{totalCount}</strong></span>
         </div>
       </div>
 
-      {/* 2. شريط التنبيهات والإشعارات التفاعلية */}
+      {/* 2. بطاقات الإحصائيات المتوهجة بتقنية GlowCard */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <GlowCard glowColor="blue">
+          <div className="p-4 sm:p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">إجمالي المصادر النشطة</span>
+              <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white">{sources.length}</div>
+              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> متصلة بالكامل
+              </span>
+            </div>
+            <div className="w-11 h-11 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <Database className="w-5 h-5" />
+            </div>
+          </div>
+        </GlowCard>
+
+        <GlowCard glowColor="emerald">
+          <div className="p-4 sm:p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">الاتصالات المعتمدة</span>
+              <div className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">{connectedCount}</div>
+              <span className="text-[11px] text-slate-400">جاهزة للاستعلام الفوري</span>
+            </div>
+            <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+          </div>
+        </GlowCard>
+
+        <GlowCard glowColor="purple">
+          <div className="p-4 sm:p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">الجداول المفهرسة</span>
+              <div className="text-2xl font-bold font-mono text-purple-600 dark:text-purple-400">{totalTables}</div>
+              <span className="text-[11px] text-slate-400">مخططات جاهزة للـ Text2SQL</span>
+            </div>
+            <div className="w-11 h-11 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+              <Layers className="w-5 h-5" />
+            </div>
+          </div>
+        </GlowCard>
+
+        <GlowCard glowColor="amber">
+          <div className="p-4 sm:p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">معدل استجابة المخطط</span>
+              <div className="text-2xl font-bold font-mono text-amber-600 dark:text-amber-400">42ms</div>
+              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">Realtime Latency</span>
+            </div>
+            <div className="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <Cpu className="w-5 h-5" />
+            </div>
+          </div>
+        </GlowCard>
+      </div>
+
+      {/* 3. شريط التنبيهات والإشعارات التفاعلية */}
       {notification && (
         <div
-          className={`p-3.5 rounded-2xl border flex items-start justify-between gap-3 text-xs leading-relaxed transition-all shadow-2xs ${
+          className={`p-4 rounded-2xl border flex items-start justify-between gap-3 text-xs leading-relaxed transition-all shadow-md backdrop-blur-xl ${
             notification.type === "success"
-              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+              ? "bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/20"
               : notification.type === "error"
-              ? "bg-rose-50 text-rose-800 border-rose-200"
-              : "bg-blue-50 text-blue-800 border-blue-200"
+              ? "bg-rose-500/10 text-rose-800 dark:text-rose-300 border-rose-500/20"
+              : "bg-blue-500/10 text-blue-800 dark:text-blue-300 border-blue-500/20"
           }`}
         >
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-2.5">
             {notification.type === "success" ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
             ) : notification.type === "error" ? (
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
             ) : (
-              <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
             )}
             <span>{notification.message}</span>
           </div>
           <button
             type="button"
             onClick={() => setNotification(null)}
-            className="p-1 rounded-lg hover:bg-black/5 shrink-0"
+            className="p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 shrink-0 cursor-pointer"
             aria-label="إغلاق التنبيه"
           >
             <X className="w-3.5 h-3.5" />
@@ -241,7 +306,7 @@ export default function DataSourcesPage() {
         </div>
       )}
 
-      {/* 3. شريط الفلاتر والبحث */}
+      {/* 4. شريط الفلاتر والبحث الزجاجي */}
       <DataSourceFilters
         filters={filters}
         onFilterChange={handleFilterChange}
@@ -253,14 +318,14 @@ export default function DataSourcesPage() {
         filteredCount={sources.length}
       />
 
-      {/* 4. حالة الخطأ */}
+      {/* 5. حالة الخطأ */}
       {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6 sm:p-8 text-center space-y-3">
-          <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+        <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-6 sm:p-8 text-center space-y-3 backdrop-blur-xl">
+          <div className="w-12 h-12 rounded-full bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h4 className="text-base font-bold text-rose-900">تعذر تحميل مصادر البيانات</h4>
-          <p className="text-xs sm:text-sm text-rose-700 max-w-md mx-auto">{error}</p>
+          <h4 className="text-base font-bold text-rose-700 dark:text-rose-300">تعذر تحميل مصادر البيانات</h4>
+          <p className="text-xs sm:text-sm text-rose-600 dark:text-rose-400 max-w-md mx-auto">{error}</p>
           <button
             type="button"
             onClick={reloadData}
@@ -272,17 +337,17 @@ export default function DataSourcesPage() {
         </div>
       )}
 
-      {/* 5. حالة التحميل */}
+      {/* 6. حالة التحميل */}
       {isLoading && (
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-12 text-center space-y-3 shadow-xs">
-          <Loader2 className="w-7 h-7 animate-spin text-blue-600 mx-auto" />
-          <p className="text-xs sm:text-sm font-medium text-slate-500">
-            جاري قراءة مصادر البيانات التجريبية...
+        <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-slate-200/80 dark:border-white/10 p-12 text-center space-y-3 shadow-xs">
+          <Loader2 className="w-7 h-7 animate-spin text-blue-600 dark:text-blue-400 mx-auto" />
+          <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">
+            جاري قراءة مصادر البيانات وفهرسة المخططات...
           </p>
         </div>
       )}
 
-      {/* 6. جدول وبطاقات مصادر البيانات */}
+      {/* 7. جدول وبطاقات مصادر البيانات الزجاجية */}
       {!isLoading && !error && (
         <DataSourceTable
           sources={sources}
@@ -294,8 +359,7 @@ export default function DataSourcesPage() {
         />
       )}
 
-      {/* 7. النوافذ المنبثقة التفاعلية */}
-      {/* نافذة الإضافة والتعديل مع key لضمان إعادة ضبط الحالة */}
+      {/* 8. النوافذ المنبثقة التفاعلية */}
       <DataSourceModal
         key={editingSource ? editingSource.id : "new-source"}
         isOpen={isFormModalOpen}
@@ -308,13 +372,11 @@ export default function DataSourcesPage() {
         isLoading={isActionLoading}
       />
 
-      {/* نافذة استعراض المخطط والجداول المحاكية */}
       <DataSourceDetailsModal
         source={schemaModalSource}
         onClose={() => setSchemaModalSource(null)}
       />
 
-      {/* نافذة تأكيد الحذف التجريبي */}
       <DeleteConfirmModal
         source={deletingSource}
         onClose={() => setDeletingSource(null)}

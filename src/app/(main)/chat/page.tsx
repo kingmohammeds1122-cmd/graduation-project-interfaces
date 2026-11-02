@@ -8,9 +8,11 @@ import {
   SlidersHorizontal,
   RotateCcw,
   AlertCircle,
-  Loader2,
+  Database,
+  Globe,
+  FileText,
 } from "lucide-react";
-import { ChatSession, ChatMessage } from "@/types/chat.types";
+import { ChatSession, ChatMessage, ChatScope } from "@/types/chat.types";
 import {
   fetchChatSessions,
   fetchQuickPrompts,
@@ -20,6 +22,7 @@ import ChatSidebar from "@/features/chat/ChatSidebar";
 import ChatWelcomeScreen from "@/features/chat/ChatWelcomeScreen";
 import ChatMessageItem from "@/features/chat/ChatMessageItem";
 import ChatInput from "@/features/chat/ChatInput";
+import ChatReasoningStepper from "@/features/chat/ChatReasoningStepper";
 
 export default function ChatPage() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -29,8 +32,10 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUserQuestion, setLastUserQuestion] = useState<string>("");
+  const [lastScope, setLastScope] = useState<ChatScope>("all");
   const [isChatSidebarMobileOpen, setIsChatSidebarMobileOpen] = useState(false);
   const [forceErrorMode, setForceErrorMode] = useState(false);
+  const [forcePartialMode, setForcePartialMode] = useState(false);
   const [showDevControls, setShowDevControls] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -84,15 +89,15 @@ export default function ChatPage() {
     setLastUserQuestion("");
   };
 
-  // إرسال رسالة
-  const handleSendMessage = async (text: string) => {
+  // إرسال استفسار تحليلي جديد
+  const handleSendMessage = async (text: string, scope: ChatScope = "all") => {
     if (!text.trim() || isLoading) return;
 
     setError(null);
     setLastUserQuestion(text);
+    setLastScope(scope);
     setIsLoading(true);
 
-    // إضافة رسالة المستخدم فورياً للواجهة
     const now = new Date();
     const timeString = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
     const optimisticUserMsg: ChatMessage = {
@@ -100,20 +105,22 @@ export default function ChatPage() {
       role: "user",
       content: text,
       timestamp: timeString,
+      scope,
     };
 
     setMessages((prev) => [...prev, optimisticUserMsg]);
 
     try {
-      const response = await sendChatMessage(text, messages, {
+      const queryText = forcePartialMode ? `${text} (جزئي)` : text;
+
+      const response = await sendChatMessage(queryText, messages, {
         forceError: forceErrorMode,
-        delayMs: 800,
+        delayMs: 1400,
+        scope,
       });
 
-      // إضافة رد المساعد الذكي
       setMessages((prev) => [...prev, response.assistantMessage]);
 
-      // تحديث أو إنشاء الجلسة في القائمة التجريبية
       if (activeSession) {
         const updated = {
           ...activeSession,
@@ -129,7 +136,7 @@ export default function ChatPage() {
         const newSession: ChatSession = {
           id: newSessionId,
           title: text.length > 28 ? `${text.substring(0, 28)}...` : text,
-          updatedAt: "الآن (عينة)",
+          updatedAt: "الآن (تحليل حي)",
           messageCount: 2,
           messages: [optimisticUserMsg, response.assistantMessage],
         };
@@ -140,24 +147,50 @@ export default function ChatPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("تعذر استلام الرد التجريبي، يرجى المحاولة مرة أخرى.");
+        setError("تعذر استلام الرد التحليلي، يرجى المحاولة مرة أخرى.");
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // إعادة المحاولة عند حدوث خطأ
   const handleRetry = () => {
     if (lastUserQuestion) {
       setError(null);
-      handleSendMessage(lastUserQuestion);
+      handleSendMessage(lastUserQuestion, lastScope);
+    }
+  };
+
+  const getActiveScopeBadge = () => {
+    switch (lastScope) {
+      case "databases":
+        return (
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+            <Database className="w-2.5 h-2.5" />
+            <span>قواعد البيانات</span>
+          </span>
+        );
+      case "documents":
+        return (
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            <FileText className="w-2.5 h-2.5" />
+            <span>المستندات</span>
+          </span>
+        );
+      case "all":
+      default:
+        return (
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10">
+            <Globe className="w-2.5 h-2.5" />
+            <span>كافة المصادر</span>
+          </span>
+        );
     }
   };
 
   return (
-    <div className="h-[calc(100vh-7rem)] flex rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-xs relative">
-      {/* 1. قائمة المحادثات السابقة (داخل صفحة الشات فقط) */}
+    <div className="h-[calc(100vh-7rem)] flex rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl overflow-hidden shadow-xs relative text-slate-800 dark:text-slate-100">
+      {/* 1. قائمة المحادثات السابقة والتحليلات */}
       <ChatSidebar
         sessions={sessions}
         activeSessionId={activeSession?.id || null}
@@ -167,67 +200,77 @@ export default function ChatPage() {
         onCloseMobile={() => setIsChatSidebarMobileOpen(false)}
       />
 
-      {/* 2. منطقة المحادثة التفاعلية الرئيسية */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/40">
-        {/* أ. شريط ترويسة المحادثة العلوي */}
-        <div className="h-14 bg-white border-b border-slate-200/80 px-3 sm:px-6 flex items-center justify-between shrink-0">
+      {/* 2. مساحة العمل التحليلية الرئيسية (BI Workspace) */}
+      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/50 dark:bg-black/20">
+        
+        {/* أ. شريط ترويسة مساحة العمل */}
+        <div className="h-14 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-white/10 px-3 sm:px-6 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            {/* زر فتح سجل المحادثات على الهاتف (منفصل وواضح عن القائمة الرئيسية) */}
+            {/* زر فتح سجل المحادثات على الهاتف */}
             <button
               type="button"
               onClick={() => setIsChatSidebarMobileOpen(true)}
-              className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+              className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 transition-colors"
               aria-label="فتح سجل المحادثات السابقة"
             >
-              <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
+              <MessageSquare className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               <span>السجل ({sessions.length})</span>
             </button>
 
             <div className="flex items-center gap-2 min-w-0">
-              <span className="w-2 h-2 rounded-full bg-violet-600 shrink-0"></span>
-              <h2 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
-                {activeSession ? activeSession.title : "محادثة جديدة"}
+              <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0 animate-pulse"></span>
+              <h2 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate font-sans">
+                {activeSession ? activeSession.title : "مساحة عمل تحليلية جديدة"}
               </h2>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-violet-50 text-violet-700 border border-violet-200 hidden sm:inline-flex">
-                محاكاة AI
-              </span>
+              <div className="hidden sm:flex items-center gap-1.5">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-500/20">
+                  AI Agent Planner
+                </span>
+                {getActiveScopeBadge()}
+              </div>
             </div>
           </div>
 
-          {/* أدوات الترويسة وأدوات التطوير المخصصة لبيئة dev فقط */}
+          {/* أدوات الترويسة وأدوات التطوير */}
           <div className="flex items-center gap-2">
-            {/* أداة محاكاة الخطأ (تظهر في بيئة التطوير فقط) */}
             {process.env.NODE_ENV === "development" && (
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowDevControls(!showDevControls)}
                   className={`p-1.5 rounded-lg border text-xs flex items-center gap-1 transition-colors cursor-pointer ${
-                    forceErrorMode
-                      ? "bg-rose-50 border-rose-200 text-rose-700 font-bold"
-                      : "bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-800"
+                    forceErrorMode || forcePartialMode
+                      ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 font-bold"
+                      : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
                   }`}
-                  title="أدوات اختبار الدردشة للمطورين"
+                  title="أدوات اختبار حالات مساحة العمل"
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
-                  <span className="text-[10px] hidden sm:inline">
-                    {forceErrorMode ? "وضع الخطأ نشط" : "اختبار"}
-                  </span>
+                  <span className="text-[10px] hidden sm:inline">أدوات الاختبار</span>
                 </button>
 
                 {showDevControls && (
-                  <div className="absolute left-0 top-full mt-2 w-56 p-3 bg-slate-900 text-slate-200 rounded-xl shadow-xl border border-slate-800 z-50 text-xs space-y-2">
-                    <span className="font-bold block text-white text-[11px]">
-                      أدوات اختبار الدردشة (Dev):
+                  <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-slate-900 text-slate-200 rounded-xl shadow-xl border border-slate-800 z-50 text-xs space-y-2.5">
+                    <span className="font-bold block text-white text-[11px] pb-1 border-b border-slate-800">
+                      محاكاة سيناريوهات الاستجابة:
                     </span>
-                    <label className="flex items-center gap-2 cursor-pointer text-slate-300">
+                    <label className="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white">
+                      <input
+                        type="checkbox"
+                        checked={forcePartialMode}
+                        onChange={(e) => setForcePartialMode(e.target.checked)}
+                        className="rounded accent-amber-600"
+                      />
+                      <span>محاكاة نتيجة جزئية (تنبيه المخطط)</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white">
                       <input
                         type="checkbox"
                         checked={forceErrorMode}
                         onChange={(e) => setForceErrorMode(e.target.checked)}
                         className="rounded accent-rose-600"
                       />
-                      <span>محاكاة خطأ في الرد القادم</span>
+                      <span>محاكاة خطأ اتصال بالخادم</span>
                     </label>
                   </div>
                 )}
@@ -239,23 +282,22 @@ export default function ChatPage() {
               <button
                 type="button"
                 onClick={handleNewChat}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-                title="بدء محادثة جديدة"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                title="بدء استفسار جديد"
               >
-                <Plus className="w-3.5 h-3.5 text-blue-600" />
-                <span className="hidden sm:inline">محادثة جديدة</span>
+                <Plus className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span className="hidden sm:inline">استفسار جديد</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* ب. منطقة رسائل المحادثة */}
+        {/* ب. منطقة رسائل ومساحة عمل المحادثة */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
-          {/* حالة المحادثة الجديدة: شاشة الترحيب والأسئلة المقترحة */}
           {messages.length === 0 ? (
             <ChatWelcomeScreen
               prompts={quickPrompts}
-              onSelectPrompt={handleSendMessage}
+              onSelectPrompt={(text) => handleSendMessage(text, "all")}
             />
           ) : (
             <>
@@ -263,38 +305,33 @@ export default function ChatPage() {
                 <ChatMessageItem key={message.id} message={message} />
               ))}
 
-              {/* مؤشر الانتظار ومعالجة الرد التجريبي */}
+              {/* 1. شريط مراحل تفكير الوكيل الذكي (AI Reasoning Stepper) أثناء التحميل */}
               {isLoading && (
-                <div className="flex items-start gap-3 max-w-4xl mr-auto animate-fade-in">
-                  <div className="w-8 h-8 rounded-xl bg-violet-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                    <Sparkles className="w-4 h-4 animate-spin" />
+                <div className="w-full flex items-start gap-3 sm:gap-4 animate-fade-in">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-violet-500/25 mt-1">
+                    <Sparkles className="w-4.5 h-4.5 animate-spin" />
                   </div>
-                  <div className="bg-white rounded-2xl rounded-tr-xs border border-slate-200/90 p-4 shadow-2xs space-y-2 text-right">
-                    <div className="flex items-center gap-2 text-xs font-bold text-violet-700">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>المساعد الذكي يجهز الرد التجريبي...</span>
-                    </div>
-                    <div className="flex gap-1.5 pt-1">
-                      <span className="w-2 h-2 rounded-full bg-violet-300 animate-bounce"></span>
-                      <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:0.2s]"></span>
-                      <span className="w-2 h-2 rounded-full bg-violet-500 animate-bounce [animation-delay:0.4s]"></span>
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <ChatReasoningStepper
+                      isLiveLoading={true}
+                      scope={lastScope}
+                    />
                   </div>
                 </div>
               )}
 
               {/* حالة الخطأ مع خيار إعادة المحاولة */}
               {error && (
-                <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-rose-800">
+                <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-rose-800 dark:text-rose-300 backdrop-blur-sm">
                   <div className="flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
                     <span>{error}</span>
                   </div>
                   {lastUserQuestion && (
                     <button
                       type="button"
                       onClick={handleRetry}
-                      className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold transition-colors shrink-0 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-semibold transition-colors shrink-0 cursor-pointer shadow-xs"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>إعادة المحاولة</span>
@@ -308,8 +345,8 @@ export default function ChatPage() {
           )}
         </div>
 
-        {/* ج. شريط الإدخال السفلي الثابت */}
-        <div className="p-3 sm:p-4 bg-white border-t border-slate-200/90 shrink-0">
+        {/* ج. شريط الإدخال ومحدد نطاق المعرفة السفلي */}
+        <div className="p-3 sm:p-4 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200/90 dark:border-white/10 shrink-0">
           <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
         </div>
       </div>

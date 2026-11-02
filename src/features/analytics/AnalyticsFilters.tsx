@@ -34,16 +34,16 @@ export default function AnalyticsFilters({
   isLoading,
 }: AnalyticsFiltersProps) {
   return (
-    <div className="bg-white rounded-3xl border border-slate-200/90 p-4 sm:p-5 shadow-xs space-y-3.5">
+    <div className="bg-white dark:bg-slate-900/60 dark:backdrop-blur-xl rounded-3xl border border-slate-200/90 dark:border-white/10 p-4 sm:p-5 shadow-xs space-y-3.5 transition-colors">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         {/* أزرار الفترة الزمنية */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 pl-1">
-            <Calendar className="w-3.5 h-3.5 text-slate-500" />
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 pl-1">
+            <Calendar className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <span>النطاق الزمني:</span>
           </div>
 
-          <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200/80">
+          <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200/80 dark:border-white/10">
             {TIME_RANGES.map((range) => {
               const isActive = filters.timeRange === range.value;
               return (
@@ -56,8 +56,8 @@ export default function AnalyticsFilters({
                   }
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     isActive
-                      ? "bg-white text-blue-700 shadow-xs border border-slate-200/60"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+                      ? "bg-white dark:bg-blue-600 text-blue-700 dark:text-white shadow-xs dark:shadow-[0_0_12px_rgba(59,130,246,0.5)] border border-slate-200/60 dark:border-blue-400/30"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
                   }`}
                 >
                   {range.label}
@@ -69,8 +69,8 @@ export default function AnalyticsFilters({
 
         {/* تصفية نوع المؤشر */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 pl-1">
-            <BarChart3 className="w-3.5 h-3.5 text-slate-500" />
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 pl-1">
+            <BarChart3 className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <span>تركيز التحليل:</span>
           </div>
 
@@ -87,8 +87,8 @@ export default function AnalyticsFilters({
                   }
                   className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                     isActive
-                      ? "bg-blue-50 text-blue-700 border-blue-300 shadow-2xs"
-                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                      ? "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700/60 shadow-2xs"
+                      : "bg-white dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800"
                   }`}
                 >
                   {type.label}
@@ -100,7 +100,7 @@ export default function AnalyticsFilters({
       </div>
 
       {/* شريط الإيضاح المرجعي */}
-      <div className="pt-2.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-500">
+      <div className="pt-2.5 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
         <div className="flex items-center gap-1.5">
           <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <span>
@@ -108,8 +108,8 @@ export default function AnalyticsFilters({
           </span>
         </div>
 
-        <span className="inline-flex items-center gap-1 text-slate-400 font-mono text-[10px]">
-          <Info className="w-3 h-3 text-slate-400" />
+        <span className="inline-flex items-center gap-1 text-slate-400 dark:text-slate-500 font-mono text-[10px]">
+          <Info className="w-3 h-3" />
           <span>معاينة تفاعلية (Mock Preview)</span>
         </span>
       </div>

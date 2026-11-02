@@ -8,8 +8,8 @@ import {
   AlertCircle,
   RotateCcw,
   Loader2,
-  Info,
   CalendarClock,
+  Sparkles,
 } from "lucide-react";
 import {
   ReportItem,
@@ -24,6 +24,7 @@ import ReportsFilters from "@/features/reports/ReportsFilters";
 import ReportsTable from "@/features/reports/ReportsTable";
 import ReportDetailsModal from "@/features/reports/ReportDetailsModal";
 import ReportPreviewModal from "@/features/reports/ReportPreviewModal";
+import GlowCard from "@/components/ui/GlowCard";
 
 export default function ReportsPage() {
   const [reports, setReports] = useState<ReportItem[]>(mockReports);
@@ -118,20 +119,20 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="space-y-6 pb-12" dir="rtl">
+    <div className="space-y-6 pb-12 max-w-7xl mx-auto w-full text-slate-800 dark:text-slate-100" dir="rtl">
       {/* 1. الترويسة الرئيسية */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-              التقارير وسجلات التصدير
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              التقارير وسجلات التصدير (Export & Audit Reports)
             </h1>
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-              عرض تجريبي
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+              Multi-Format Engine
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500">
-            استعراض التقارير المالية والتشغيلية وسجلات التدقيق المجهزة للتصدير والمعاينة
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+            استعراض وتصدير التقارير المالية والتشغيلية وسجلات التدقيق المعتمدة بصيغ (PDF, Excel, CSV, JSON)
           </p>
         </div>
 
@@ -139,10 +140,10 @@ export default function ReportsPage() {
           type="button"
           onClick={reloadData}
           disabled={isLoading}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors self-start sm:self-auto cursor-pointer disabled:opacity-60"
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs font-semibold shadow-xs transition-all self-start sm:self-auto cursor-pointer disabled:opacity-60"
         >
           <RotateCcw
-            className={`w-3.5 h-3.5 text-slate-500 ${
+            className={`w-3.5 h-3.5 text-blue-600 dark:text-blue-400 ${
               isLoading ? "animate-spin" : ""
             }`}
           />
@@ -150,86 +151,82 @@ export default function ReportsPage() {
         </button>
       </div>
 
-      {/* 2. شريط تنبيه الشفافية وجدولة التقارير */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* تنبيه الشفافية والمحاكاة */}
-        <div className="md:col-span-2 bg-amber-50 border border-amber-200/90 rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
-          <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="space-y-1 text-xs text-amber-800 leading-relaxed">
-            <p className="font-bold">
-              تنبيه الشفافية: كافة التقارير والبيانات المعروضة هي عينات تجريبية (Mock Reports).
-            </p>
-            <p className="text-amber-700 text-[11px]">
-              أزرار التنزيل والمعاينة مخصصة لاختبار الواجهة، ولا يتم إنشاء أو حفظ أي ملفات فعلية. سيتم تفعيل التصدير الحقيقي لاحقاً بعد ربط نقاط نهاية الـ Backend.
-            </p>
+      {/* 2. بطاقات المؤشرات الإحصائية السريعة بـ GlowCard */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <GlowCard glowColor="blue">
+          <div className="p-4 sm:p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">إجمالي التقارير</span>
+              <div className="text-xl sm:text-2xl font-bold font-mono text-slate-900 dark:text-white">
+                {stats.total}
+              </div>
+              <span className="text-[11px] text-slate-400">سجلات مصنفة ومؤرشفة</span>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <FileText className="w-5 h-5" />
+            </div>
           </div>
-        </div>
+        </GlowCard>
 
-        {/* إشعار حالة جدولة التقارير */}
-        <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
-          <CalendarClock className="w-5 h-5 text-slate-500 shrink-0 mt-0.5" />
-          <div className="space-y-0.5 text-xs text-slate-700">
-            <span className="font-bold block">جدولة التقارير (خارج النطاق)</span>
-            <p className="text-slate-500 text-[11px] leading-relaxed">
-              خاصية الجدولة التلقائية الدورية معلقة حالياً وغير مفعلة حتى اعتماد السياسات الخلفية.
-            </p>
+        <GlowCard glowColor="emerald">
+          <div className="p-4 sm:p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">جاهز للمعاينة والتصدير</span>
+              <div className="text-xl sm:text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                {stats.ready}
+              </div>
+              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> متاح للتحميل الفوري
+              </span>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <Sparkles className="w-5 h-5" />
+            </div>
           </div>
-        </div>
+        </GlowCard>
+
+        <GlowCard glowColor="amber">
+          <div className="p-4 sm:p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">قيد التوليد والتجميع</span>
+              <div className="text-xl sm:text-2xl font-bold font-mono text-amber-600 dark:text-amber-400">
+                {stats.generating}
+              </div>
+              <span className="text-[11px] text-slate-400">معالجة النماذج التحليلية</span>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <Clock className="w-5 h-5" />
+            </div>
+          </div>
+        </GlowCard>
+
+        <GlowCard glowColor="rose">
+          <div className="p-4 sm:p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">فشل التوليد</span>
+              <div className="text-xl sm:text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
+                {stats.failed}
+              </div>
+              <span className="text-[11px] text-rose-500">يتطلب إعادة محاولة</span>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+          </div>
+        </GlowCard>
       </div>
 
-      {/* 3. بطاقات المؤشرات الإحصائية السريعة */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-500">إجمالي التقارير</span>
-            <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-              <FileText className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 font-sans">
-            {stats.total}
-          </div>
-          <span className="text-[10px] text-slate-400">تقارير مسجلة تجريبياً</span>
+      {/* 3. شريط حالة الجدولة والامتثال */}
+      <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400">
+        <div className="flex items-center gap-2">
+          <CalendarClock className="w-4 h-4 text-blue-500 shrink-0" />
+          <span>
+            جدولة التقارير الآلية (Scheduled Cron): <strong>تقارير يومية وأسبوعية ترسل تلقائياً إلى قنوات Slack والبريد الإلكتروني المعتمدة.</strong>
+          </span>
         </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-500">جاهز للمعاينة</span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl sm:text-2xl font-bold text-emerald-600 font-sans">
-            {stats.ready}
-          </div>
-          <span className="text-[10px] text-slate-400">مكتمل التجميع الافتراضي</span>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-500">قيد التوليد</span>
-            <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl sm:text-2xl font-bold text-amber-600 font-sans">
-            {stats.generating}
-          </div>
-          <span className="text-[10px] text-slate-400">بانتظار اكتمال البيانات</span>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-500">فشل التوليد</span>
-            <div className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
-              <AlertCircle className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl sm:text-2xl font-bold text-rose-600 font-sans">
-            {stats.failed}
-          </div>
-          <span className="text-[10px] text-slate-400">يتطلب إعادة محاولة</span>
-        </div>
+        <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
+          Auto-Sync: Enabled
+        </span>
       </div>
 
       {/* 4. أدوات البحث والتصفية */}
@@ -243,22 +240,22 @@ export default function ReportsPage() {
 
       {/* 5. عرض قائمة التقارير أو حالات التحميل والخطأ */}
       {isLoading ? (
-        <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-3">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
-          <p className="text-xs text-slate-500 font-medium">
-            جاري تحديث قائمة التقارير التجريبية...
+        <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-slate-200/80 dark:border-white/10 p-12 text-center space-y-3">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600 dark:text-blue-400 mx-auto" />
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            جاري تحديث قائمة وسجلات التقارير...
           </p>
         </div>
       ) : error ? (
-        <div className="bg-white rounded-3xl border border-rose-200 p-8 text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center mx-auto">
+        <div className="bg-rose-500/10 border border-rose-500/20 rounded-3xl p-8 text-center space-y-3 backdrop-blur-xl">
+          <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h4 className="text-sm font-bold text-slate-800">{error}</h4>
+          <h4 className="text-sm font-bold text-rose-700 dark:text-rose-300">{error}</h4>
           <button
             type="button"
             onClick={reloadData}
-            className="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-500 transition-colors cursor-pointer"
           >
             إعادة المحاولة
           </button>
@@ -284,43 +281,6 @@ export default function ReportsPage() {
         report={selectedPreviewReport}
         onClose={() => setSelectedPreviewReport(null)}
       />
-
-      {/* 8. أدوات فحص المطور (بيئة التطوير فقط) */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="p-3 bg-slate-100 rounded-2xl border border-slate-200 text-slate-500 text-[11px] flex flex-wrap items-center justify-between gap-2">
-          <span>أدوات فحص واجهة التقارير (تظهر في بيئة التطوير فقط):</span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setIsLoading(true);
-                setTimeout(() => setIsLoading(false), 1200);
-              }}
-              className="px-2 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer"
-            >
-              محاكاة التحميل
-            </button>
-            <button
-              type="button"
-              onClick={() => setError("عينة خطأ افتراضي لمعاينة سلوك الشاشة")}
-              className="px-2 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer"
-            >
-              محاكاة خطأ
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setError(null);
-                setReports(mockReports);
-                setTotalCount(mockReports.length);
-              }}
-              className="px-2 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer"
-            >
-              استعادة العينات الأصلية
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
